@@ -1,10 +1,11 @@
-import { KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView,SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { TextInput, TouchableOpacity } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
+import HeaderForm from "../Components/HeaderForm";
 
 interface FormData {
   email: string;
@@ -41,7 +42,8 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <HeaderForm title="Log in"/>
       <View style={styles.inputContainer}>
         <Controller
           control={control}
@@ -55,6 +57,7 @@ const LoginScreen = () => {
               onChangeText={onChange}
               value={value}
               style={styles.input}
+              
             />
           )}
           name="email"
@@ -74,6 +77,7 @@ const LoginScreen = () => {
               onChangeText={onChange}
               value={value}
               style={styles.input}
+              secureTextEntry
             />
           )}
           name="password"
@@ -87,6 +91,9 @@ const LoginScreen = () => {
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
+        <View>
+          <Text>Already have an account?</Text>
+        </View>
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("Register");
@@ -96,7 +103,7 @@ const LoginScreen = () => {
           <Text style={styles.buttonOutlineText}>Register</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -107,6 +114,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    gap:20,
   },
   inputContainer: {
     width: "80%",
@@ -132,6 +140,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonOutline: {
+    width:"60%",
     backgroundColor: "#fff",
     marginTop: 5,
     borderColor: "#0782F9",

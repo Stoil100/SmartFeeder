@@ -1,11 +1,21 @@
 import { StyleSheet, Text, View,TouchableOpacity } from 'react-native'
-import React from 'react'
-
+import React from 'react';
+import { auth } from '../firebase';
+import { useNavigation } from "@react-navigation/native";
 
 const InfoScreen = () => {
+  const navigation=useNavigation();
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-       <TouchableOpacity onPress={() => {}} style={styles.button}>
+       <TouchableOpacity onPress={handleLogout} style={styles.button}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>

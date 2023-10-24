@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { TextInput, TouchableOpacity } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -7,6 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import { setDoc, doc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { set, ref } from "firebase/database";
+import HeaderForm from "../Components/HeaderForm";
 
 
 interface FormData {
@@ -55,7 +56,8 @@ const RegisterScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <SafeAreaView style={styles.container} >
+      <HeaderForm title="Sign up"/>
       <View style={styles.inputContainer}>
         <Controller
           control={control}
@@ -131,22 +133,25 @@ const RegisterScreen = () => {
         {errors.confirmPassword && <Text>This is required.</Text>}
       </View>
       <View style={styles.buttonContainer}>
+      <TouchableOpacity
+          onPress={handleSubmit(handleSignup)}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Register</Text>
+        </TouchableOpacity>
+        <View>
+          <Text>Already have an account?</Text>
+        </View>
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("Login");
           }}
-          style={styles.button}
+          style={[styles.button,styles.buttonOutline]}
         >
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleSubmit(handleSignup)}
-          style={[styles.button, styles.buttonOutline]}
-        >
-          <Text style={styles.buttonOutlineText}>Register</Text>
+          <Text style={styles.buttonOutlineText}>Login</Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -157,6 +162,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    gap:20,
   },
   inputContainer: {
     width: "80%",
@@ -170,7 +176,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: "60%",
-    justifyContent: "center",
+    justifyContent: "space-around",
     alignItems: "center",
     marginTop: 40,
   },
@@ -182,6 +188,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonOutline: {
+    width:"60%",
     backgroundColor: "#fff",
     marginTop: 5,
     borderColor: "#0782F9",
