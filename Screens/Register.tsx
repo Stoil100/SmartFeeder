@@ -1,17 +1,22 @@
 import { KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { TextInput, TouchableOpacity } from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, firestore,db } from "../firebase";
 import { useForm, Controller } from "react-hook-form";
+import { setDoc, doc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
+import { set, ref } from "firebase/database";
+
 
 interface FormData {
+  username: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
   const navigation = useNavigation();
   const {
     control,
@@ -26,23 +31,50 @@ const LoginScreen = () => {
     },
   });
   const [loading, setLoading] = useState(false);
-  const handleLogin = async (data: FormData) => {
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      );
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
+  const handleSignup = async (data: FormData) => {
+    if (data.password === data.confirmPassword) {
+      setLoading(true);
+      try {
+        const { user } = await createUserWithEmailAndPassword(
+          auth,
+          data.email,
+          data.password
+        );
+        await set(ref(db, `users/${user.uid}`), {
+          email: user.email,
+          username:data.username,
+        });
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    } else {
+      console.log("password doesnt match");
     }
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.inputContainer}>
+        <Controller
+          control={control}
+          rules={{
+            maxLength: 100,
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Username"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              style={styles.input}
+            />
+          )}
+          name="username"
+        />
+        {errors.username && <Text>This is required.</Text>}
         <Controller
           control={control}
           rules={{
@@ -79,28 +111,46 @@ const LoginScreen = () => {
           name="password"
         />
         {errors.password && <Text>This is required.</Text>}
+        <Controller
+          control={control}
+          rules={{
+            maxLength: 100,
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              placeholder="Confirm Password"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              style={styles.input}
+            />
+          )}
+          name="confirmPassword"
+        />
+        {errors.confirmPassword && <Text>This is required.</Text>}
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={handleSubmit(handleLogin)}
+          onPress={() => {
+            navigation.navigate("Login");
+          }}
           style={styles.button}
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Register");
-          }}
+          onPress={handleSubmit(handleSignup)}
           style={[styles.button, styles.buttonOutline]}
         >
           <Text style={styles.buttonOutlineText}>Register</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
-export default LoginScreen;
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
