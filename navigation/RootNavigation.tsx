@@ -7,7 +7,5 @@ import UserStack from './userStack';
 
 export default function RootNavigation() {
   const { user } = useAuth();
-  console.log(user);
-
   return user ? <UserStack/> : <AuthStack />;
 }
